@@ -3,74 +3,25 @@ import { getAllBookReviews } from "@/lib/mdx";
 
 export default async function Home() {
   const reviews = await getAllBookReviews();
-
+  const latest = reviews[0];
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-black">
-      <main className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-            My Book Reviews
-          </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-300">
-            A collection of book reviews across fiction, non-fiction, tech, and self-help
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {reviews.map((review) => (
-            <Link
-              key={review.slug}
-              href={`/book-reviews/${review.slug}`}
-              className="block bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow p-6"
-            >
-              <div className="flex items-start space-x-4">
-                <div className="flex-shrink-0">
-                  <div className="w-24 h-32 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
-                      Cover
-                    </span>
-                  </div>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
-                    {review.title}
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
-                    {review.author}
-                  </p>
-                  <div className="flex items-center mt-2 space-x-2">
-                    <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 rounded-full">
-                      {review.category}
-                    </span>
-                    <div className="flex space-x-1">
-                      {[...Array(5)].map((_, i) => (
-                        <span
-                          key={i}
-                          className={`text-sm ${
-                            i < review.rating
-                              ? 'text-yellow-400'
-                              : 'text-gray-300 dark:text-gray-600'
-                          }`}
-                        >
-                          ★
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-
-        <div className="mt-12 text-center">
-          <Link
-            href="/book-reviews"
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-          >
-            View All Reviews
-          </Link>
-        </div>
+    <div className="review-room">
+      <main className="review-shell">
+        <nav className="review-nav" aria-label="Book reviews navigation"><span className="review-mark">BOOK / REVIEWS</span><Link href="/book-reviews">Open the full index</Link></nav>
+        <header className="review-hero">
+          <div><h1>Notes from the books that stayed.</h1><p>A small reading ledger across habits, craft, and focused work. Every entry is a dated cut, not a shelf of recommendations.</p></div>
+          <p className="review-hero-note"><strong>{reviews.length}</strong> recorded reviews<br />text-first archive · updated by hand</p>
+        </header>
+        {latest ? <section className="workprint" aria-labelledby="latest-cut">
+          <p className="rail-label" id="latest-cut">Current workprint / latest cut</p>
+          <div className="selected-cut">
+            <div className="cut-window"><span className="frame-label">TEXT ONLY</span><span className="cover-title">{latest.title}</span><span className="frame-label">{latest.category}</span></div>
+            <div className="cut-copy"><h2><Link href={`/book-reviews/${latest.slug}`}>{latest.title}</Link></h2><p>{latest.author} · {latest.date}</p><div className="rating-track" role="img" aria-label={`${latest.rating} out of 5`}>{[0, 1, 2, 3, 4].map((i) => <span key={i} className={i < latest.rating ? "is-on" : ""} aria-hidden="true" />)}</div></div>
+            <div className="cut-meta"><strong>Read as</strong>{latest.category}<br /><strong>ISBN</strong>{latest.isbn}</div>
+          </div>
+          <div className="review-strip">{reviews.slice(1, 4).map((review, index) => <Link className="strip-item" href={`/book-reviews/${review.slug}`} key={review.slug}><span className="frame-label"><span className="strip-index">0{index + 2}</span> / saved frame</span><span className="strip-title">{review.title}</span><span className="strip-author">{review.author} · {review.date}</span></Link>)}</div>
+        </section> : <p>No reviews have been cut yet.</p>}
+        <footer className="review-footer">Covers are not attached in this archive. The reading notes are the source material.</footer>
       </main>
     </div>
   );
